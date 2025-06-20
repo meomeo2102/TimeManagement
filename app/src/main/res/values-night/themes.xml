@@ -1,0 +1,10 @@
+<resources>
+    <style name="Theme.TimeManagement" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="colorPrimary">#223344</item>
+        <item name="colorAccent">#FFB6B6</item>
+        <item name="android:colorBackground">#121212</item>
+        <item name="android:statusBarColor">#223344</item>
+        <item name="android:navigationBarColor">#223344</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

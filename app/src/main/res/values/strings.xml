@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Time Management</string>
+    <string-array name="category_array">
+        <item>Tất cả</item>
+        <item>Công việc</item>
+        <item>Cá nhân</item>
+        <item>Danh sách yêu thích</item>
+        <item>Ngày sinh nhật</item>
+    </string-array>
+</resources>
