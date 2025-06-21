@@ -1,61 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:layout_height="match_parent">
 
-    <!-- Thanh điều hướng chính (lên trên cùng, bo tròn, vuốt ngang) -->
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
-        android:background="@color/colorAccent">
-
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scrollbars="none">
-
-            <com.google.android.material.bottomnavigation.BottomNavigationView
-                android:id="@+id/bottom_nav"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                app:menu="@menu/bottom_nav_menu"
-                app:itemTextColor="@color/bottom_nav_item_color_selector" />
-        </HorizontalScrollView>
-    </androidx.cardview.widget.CardView>
-
-    <!-- Khu vực chính để chứa Fragment -->
-    <FrameLayout
-        android:id="@+id/main_frame"
+    <!-- Nội dung chính -->
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="72dp" />
+        android:background="@color/md_theme_background">
 
-    <!-- Floating Action Button -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add_task"
+        <!-- Toolbar -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:titleTextColor="@android:color/white"
+            app:title="To-Do List" />
+
+        <!-- Top Navigation Bar -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_gravity="top"
+            android:layout_marginTop="?attr/actionBarSize"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="8dp"
+            android:backgroundTint="@color/md_theme_primaryContainer">
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:paddingHorizontal="16dp">
+
+                <com.google.android.material.bottomnavigation.BottomNavigationView
+                    android:id="@+id/bottom_nav"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    app:menu="@menu/bottom_nav_menu"
+                    app:itemIconTint="@color/bottom_nav_selector"
+                    app:itemTextColor="@color/bottom_nav_text_color_selector"
+                    app:itemActiveIndicatorStyle="@style/Widget.Material3.BottomNavigationView.ActiveIndicator"/>
+            </HorizontalScrollView>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Main Content -->
+        <FrameLayout
+            android:id="@+id/main_frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="120dp"
+            android:layout_marginBottom="72dp" />
+
+        <!-- Bottom Navigation Secondary -->
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_nav_secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:backgroundTint="@color/md_theme_primaryContainer"
+            app:menu="@menu/bottom_nav_secondary_menu"
+            app:itemIconTint="@color/bottom_nav_selector"
+            app:itemTextColor="@color/bottom_nav_text_color_selector"
+            app:itemActiveIndicatorStyle="@style/Widget.Material3.BottomNavigationView.ActiveIndicator" />
+
+        <!-- FAB -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_add_task"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="100dp"
+            android:layout_marginEnd="24dp"
+            android:contentDescription="Thêm công việc"
+            android:src="@android:drawable/ic_input_add"
+            app:backgroundTint="@color/md_theme_primary" />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <!-- Navigation Drawer (menu trái) -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="@color/colorPrimary" />
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:menu="@menu/nav_drawer_menu"
+        app:headerLayout="@layout/nav_header" />
 
-    <!-- Thanh điều hướng phụ (dưới cùng) -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_nav_secondary"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="?android:attr/windowBackground"
-        app:menu="@menu/bottom_nav_secondary_menu"
-        app:itemIconTint="@color/bottom_nav_item_color_selector"
-        app:itemTextColor="@color/bottom_nav_item_color_selector" />
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

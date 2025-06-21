@@ -1,26 +1,25 @@
 package com.example.timemanagement;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
-
-    private TaskDatabase db;
+    TaskDatabase db;
     private final Executor executor = Executors.newSingleThreadExecutor();
 
     @Override
@@ -30,10 +29,14 @@ public class MainActivity extends AppCompatActivity {
 
         db = TaskDatabase.getInstance(this);
 
+        // Hiển thị TaskFragment mặc định
+        Fragment defaultFragment = TaskFragment.newInstance("category", "Tất cả");
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.main_frame, TaskFragment.newInstance("Tất cả"))
+                .replace(R.id.main_frame, defaultFragment)
                 .commit();
+
+        findViewById(R.id.bottom_nav).setVisibility(View.VISIBLE);
 
         FloatingActionButton fabAddTask = findViewById(R.id.fab_add_task);
         fabAddTask.setOnClickListener(v -> showAddTaskDialog());
@@ -42,17 +45,16 @@ public class MainActivity extends AppCompatActivity {
         bottomNav.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
             int itemId = item.getItemId();
-
             if (itemId == R.id.nav_all) {
-                selectedFragment = TaskFragment.newInstance("Tất cả");
+                selectedFragment = TaskFragment.newInstance("category", "Tất cả");
             } else if (itemId == R.id.nav_work) {
-                selectedFragment = TaskFragment.newInstance("Công việc");
+                selectedFragment = TaskFragment.newInstance("category", "Công việc");
             } else if (itemId == R.id.nav_personal) {
-                selectedFragment = TaskFragment.newInstance("Cá nhân");
+                selectedFragment = TaskFragment.newInstance("category", "Cá nhân");
             } else if (itemId == R.id.nav_favorites) {
-                selectedFragment = TaskFragment.newInstance("Danh sách yêu thích");
+                selectedFragment = TaskFragment.newInstance("category", "Danh sách yêu thích");
             } else if (itemId == R.id.nav_birthdays) {
-                selectedFragment = TaskFragment.newInstance("Ngày sinh nhật");
+                selectedFragment = TaskFragment.newInstance("category", "Ngày sinh nhật");
             }
 
             if (selectedFragment != null) {
@@ -60,46 +62,70 @@ public class MainActivity extends AppCompatActivity {
                         .beginTransaction()
                         .replace(R.id.main_frame, selectedFragment)
                         .commit();
+                // ✅ bottom_nav luôn hiển thị trong TaskFragment
+                findViewById(R.id.bottom_nav).setVisibility(View.VISIBLE);
             }
             return true;
         });
 
         BottomNavigationView bottomNavSecondary = findViewById(R.id.bottom_nav_secondary);
         bottomNavSecondary.setOnItemSelectedListener(item -> {
+            Fragment selectedFragment = null;
             int itemId = item.getItemId();
+
             if (itemId == R.id.nav_menu) {
-                Toast.makeText(this, "Menu clicked", Toast.LENGTH_SHORT).show();
+                selectedFragment = new MenuFragment();
             } else if (itemId == R.id.nav_tasks) {
-                Toast.makeText(this, "Nhiệm vụ clicked", Toast.LENGTH_SHORT).show();
+                selectedFragment = TaskFragment.newInstance("category", "Tất cả");
             } else if (itemId == R.id.nav_calendar) {
-                Toast.makeText(this, "Lịch clicked", Toast.LENGTH_SHORT).show();
+                selectedFragment = new CalendarFragment();
             } else if (itemId == R.id.nav_profile) {
-                Toast.makeText(this, "Của tôi clicked", Toast.LENGTH_SHORT).show();
+                selectedFragment = new ProfileFragment();
             }
+
+            if (selectedFragment != null) {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.main_frame, selectedFragment)
+                        .commit();
+
+                //Hiển thị bottom_nav nếu là TaskFragment
+                View topNav = findViewById(R.id.bottom_nav);
+                if (selectedFragment instanceof TaskFragment) {
+                    topNav.setVisibility(View.VISIBLE);
+                } else {
+                    topNav.setVisibility(View.GONE);
+                }
+            }
+
             return true;
         });
     }
 
     private void showAddTaskDialog() {
-        LayoutInflater inflater = getLayoutInflater();
-        final View dialogView = inflater.inflate(R.layout.dialog_add_task, null);
-        final EditText edtTaskName = dialogView.findViewById(R.id.edtTaskName);
-        final Spinner spinnerCategory = dialogView.findViewById(R.id.spinnerCategory);
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_task, null);
+        EditText edtTaskName = dialogView.findViewById(R.id.edtTaskName);
+        MaterialAutoCompleteTextView spinnerCategory = dialogView.findViewById(R.id.spinnerCategory);
 
-        new AlertDialog.Builder(this)
-                .setTitle("📝 Thêm công việc")
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1,
+                getResources().getStringArray(R.array.category_array));
+        spinnerCategory.setAdapter(adapter);
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Thêm công việc")
                 .setView(dialogView)
-                .setPositiveButton("Lưu", (dialog, which) -> {
+                .setPositiveButton("Lưu", (d, which) -> {
                     String taskName = edtTaskName.getText().toString().trim();
-                    String category = spinnerCategory.getSelectedItem().toString();
-                    if (!taskName.isEmpty()) {
+                    String category = spinnerCategory.getText().toString().trim();
+                    if (!taskName.isEmpty() && !category.isEmpty()) {
                         Task task = new Task(taskName, System.currentTimeMillis(), category);
                         executor.execute(() -> {
                             db.taskDao().insert(task);
                             runOnUiThread(this::reloadTasks);
                         });
                     } else {
-                        Toast.makeText(this, "Vui lòng nhập tên công việc!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Vui lòng nhập tên công việc và danh mục!", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNegativeButton("Hủy", null)
@@ -107,32 +133,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void editTask(Task task) {
-        LayoutInflater inflater = getLayoutInflater();
-        final View dialogView = inflater.inflate(R.layout.dialog_add_task, null);
-        final EditText edtTaskName = dialogView.findViewById(R.id.edtTaskName);
-        final Spinner spinnerCategory = dialogView.findViewById(R.id.spinnerCategory);
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_task, null);
+        EditText edtTaskName = dialogView.findViewById(R.id.edtTaskName);
+        MaterialAutoCompleteTextView spinnerCategory = dialogView.findViewById(R.id.spinnerCategory);
 
-        // Pre-fill dialog with task data
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1,
+                getResources().getStringArray(R.array.category_array));
+        spinnerCategory.setAdapter(adapter);
+
         edtTaskName.setText(task.getName());
-        ArrayAdapter<String> adapter = (ArrayAdapter<String>) spinnerCategory.getAdapter();
-        int categoryPosition = adapter.getPosition(task.getCategory());
-        spinnerCategory.setSelection(categoryPosition);
+        spinnerCategory.setText(task.getCategory(), false);
 
-        new AlertDialog.Builder(this)
-                .setTitle("📝 Sửa công việc")
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Sửa công việc")
                 .setView(dialogView)
-                .setPositiveButton("Lưu", (dialog, which) -> {
+                .setPositiveButton("Lưu", (d, which) -> {
                     String taskName = edtTaskName.getText().toString().trim();
-                    String category = spinnerCategory.getSelectedItem().toString();
-                    if (!taskName.isEmpty()) {
+                    String category = spinnerCategory.getText().toString().trim();
+                    if (!taskName.isEmpty() && !category.isEmpty()) {
                         executor.execute(() -> {
                             Task updatedTask = new Task(taskName, task.getTimestamp(), category, task.isCompleted());
-                            updatedTask.id = task.id;
+                            updatedTask.setId(task.getId());
                             db.taskDao().update(updatedTask);
                             runOnUiThread(this::reloadTasks);
                         });
                     } else {
-                        Toast.makeText(this, "Vui lòng nhập tên công việc!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Vui lòng nhập tên công việc và danh mục!", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNegativeButton("Hủy", null)
@@ -144,5 +171,9 @@ public class MainActivity extends AppCompatActivity {
         if (current instanceof TaskFragment) {
             ((TaskFragment) current).refreshTasks();
         }
+    }
+
+    public Executor getExecutor() {
+        return executor;
     }
 }

@@ -1,18 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/nav_all"
-        android:title="Tất cả" />
+        android:title="Tất cả"
+        android:icon="@drawable/ic_tasks" />
     <item
         android:id="@+id/nav_work"
-        android:title="Công việc" />
+        android:title="Công việc"
+        android:icon="@drawable/ic_tasks" />
     <item
         android:id="@+id/nav_personal"
-        android:title="Cá nhân" />
+        android:title="Cá nhân"
+        android:icon="@drawable/ic_tasks" />
     <item
         android:id="@+id/nav_favorites"
-        android:title="Danh sách yêu thích" />
+        android:title="Yêu thích"
+        android:icon="@drawable/ic_tasks" />
     <item
         android:id="@+id/nav_birthdays"
-        android:title="Ngày sinh nhật" />
+        android:title="Sinh nhật"
+        android:icon="@drawable/ic_tasks" />
 </menu>

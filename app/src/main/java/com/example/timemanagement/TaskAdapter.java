@@ -1,93 +1,86 @@
 package com.example.timemanagement;
 
-import android.content.Context;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
-
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.timemanagement.databinding.TaskItemBinding;
-
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
 
     private List<Task> taskList;
-    private final Executor executor = Executors.newSingleThreadExecutor();
+    private final MainActivity activity;
+    private final TaskViewModel taskViewModel;
 
-    public TaskAdapter(List<Task> taskList) {
-        this.taskList = taskList != null ? taskList : new ArrayList<>();
+    public TaskAdapter(MainActivity activity, TaskViewModel taskViewModel) {
+        this.activity = activity;
+        this.taskViewModel = taskViewModel;
     }
 
-    public void setTasks(List<Task> newList) {
-        this.taskList = newList != null ? newList : new ArrayList<>();
+    public void setTasks(List<Task> tasks) {
+        this.taskList = tasks;
         notifyDataSetChanged();
     }
 
     @NonNull
     @Override
     public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        TaskItemBinding binding = TaskItemBinding.inflate(inflater, parent, false);
-        return new TaskViewHolder(binding);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.task_item, parent, false);
+        return new TaskViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         Task task = taskList.get(position);
-        Context context = holder.itemView.getContext();
+        holder.taskName.setText(task.getName());
 
-        holder.binding.taskName.setText(task.name);
+        holder.taskTime.setText(new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                .format(task.getTimestamp()));
 
-        String formattedTime = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-                .format(new Date(task.timestamp));
-        holder.binding.taskTime.setText(formattedTime);
+        // Ngăn callback vô hạn
+        holder.checkboxDone.setOnCheckedChangeListener(null);
+        holder.checkboxDone.setChecked(task.isCompleted());
 
-        updateUIState(holder, task.completed, context);
+        // Set màu & gạch nếu hoàn thành
+        holder.itemView.setBackgroundResource(task.isCompleted()
+                ? R.drawable.bg_task_card_done
+                : R.drawable.bg_task_card);
 
-        holder.binding.checkboxDone.setOnCheckedChangeListener(null);
-        holder.binding.checkboxDone.setChecked(task.completed);
-        holder.binding.checkboxDone.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            task.completed = isChecked;
-            executor.execute(() ->
-                    TaskDatabase.getInstance(context).taskDao().markCompleted(task.id, isChecked));
-            updateUIState(holder, isChecked, context);
+        holder.taskName.setPaintFlags(task.isCompleted()
+                ? holder.taskName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
+                : holder.taskName.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+
+        //Checkbox hoàn thành
+        holder.checkboxDone.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            task.setCompleted(isChecked);
+            new Thread(() -> {
+                taskViewModel.updateTask(task);
+                activity.runOnUiThread(activity::reloadTasks); // Reload UI
+            }).start();
         });
-
-        holder.binding.btnEdit.setOnClickListener(v -> {
-            if (context instanceof MainActivity) {
-                ((MainActivity) context).editTask(task);
-            }
-        });
-
-        holder.binding.btnDelete.setOnClickListener(v -> {
-            executor.execute(() ->
-                    TaskDatabase.getInstance(context).taskDao().deleteTask(task.id));
-            if (context instanceof MainActivity) {
-                ((MainActivity) context).reloadTasks();
-            }
-        });
-    }
-
-    private void updateUIState(TaskViewHolder holder, boolean isCompleted, Context context) {
-        if (isCompleted) {
-            holder.binding.taskName.setPaintFlags(holder.binding.taskName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            holder.binding.taskName.setAlpha(0.5f);
-            holder.binding.getRoot().setBackground(ContextCompat.getDrawable(context, R.drawable.bg_task_card_done));
+        if (task.isCompleted()) {
+            holder.taskTime.setVisibility(View.VISIBLE);
         } else {
-            holder.binding.taskName.setPaintFlags(holder.binding.taskName.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
-            holder.binding.taskName.setAlpha(1.0f);
-            holder.binding.getRoot().setBackground(ContextCompat.getDrawable(context, R.drawable.bg_task_card));
+            holder.taskTime.setVisibility(View.GONE);
         }
+
+        //Nút sửa
+        holder.btnEdit.setOnClickListener(v -> activity.editTask(task));
+
+        //Nút xóa
+        holder.btnDelete.setOnClickListener(v -> {
+            new Thread(() -> {
+                taskViewModel.deleteTask(task);
+                activity.runOnUiThread(activity::reloadTasks); // Reload UI
+            }).start();
+        });
     }
 
     @Override
@@ -95,12 +88,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         return taskList != null ? taskList.size() : 0;
     }
 
-    public static class TaskViewHolder extends RecyclerView.ViewHolder {
-        TaskItemBinding binding;
+    static class TaskViewHolder extends RecyclerView.ViewHolder {
+        TextView taskName, taskTime;
+        CheckBox checkboxDone;
+        Button btnEdit, btnDelete;
 
-        public TaskViewHolder(@NonNull TaskItemBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
+        public TaskViewHolder(@NonNull View itemView) {
+            super(itemView);
+            taskName = itemView.findViewById(R.id.taskName);
+            taskTime = itemView.findViewById(R.id.taskTime);
+            checkboxDone = itemView.findViewById(R.id.checkboxDone);
+            btnEdit = itemView.findViewById(R.id.btnEdit);
+            btnDelete = itemView.findViewById(R.id.btnDelete);
         }
     }
 }

@@ -1,12 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
+<resources>
+    <!-- Màu chủ đạo -->
     <color name="colorPrimary">#A8DADC</color>
     <color name="colorPrimaryDark">#457B9D</color>
     <color name="colorAccent">#F1FAEE</color>
+
+    <!-- Material 3 theme -->
+    <color name="md_theme_primary">@color/colorPrimary</color>
+    <color name="md_theme_primaryContainer">@color/colorPrimaryDark</color>
+    <color name="md_theme_background">@color/colorAccent</color>
+
+    <!-- Văn bản -->
     <color name="textPrimary">#1D3557</color>
     <color name="textSecondary">#6C757D</color>
+
+    <!-- Nền thẻ -->
     <color name="taskCard">#F1FAEE</color>
     <color name="mint_done">#C8E6C9</color>
+
+    <!-- Nút -->
     <color name="buttonEdit">#4DB6AC</color>
     <color name="buttonDelete">#EF9A9A</color>
+
+    <!-- Ripple -->
+    <color name="rippleEdit">#334DB6AC</color>
+    <color name="rippleDelete">#33EF9A9A</color>
+
+    <!-- Màu bottom nav -->
+    <color name="bottom_nav_selected">#1D3557</color>
+    <color name="bottom_nav_unselected">#6C757D</color>
+
 </resources>

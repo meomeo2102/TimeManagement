@@ -1,12 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.TimeManagement" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+
+    <style name="Theme.TimeManagement" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryVariant">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimaryContainer">@color/colorPrimaryDark</item>
+        <item name="colorOnPrimary">@android:color/white</item>
 
         <item name="android:colorBackground">@color/colorAccent</item>
+        <item name="colorSurface">@color/colorAccent</item>
+        <item name="colorOnSurface">@color/textPrimary</item>
+
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
         <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">@color/colorAccent</item>
     </style>
+
 </resources>

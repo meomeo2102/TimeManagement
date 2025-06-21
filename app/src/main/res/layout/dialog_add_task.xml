@@ -1,22 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="24dp"
+    android:background="?attr/colorSurface"
+    android:clipToPadding="false">
 
-    <EditText
-        android:id="@+id/edtTaskName"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayoutTaskName"
+        style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Tên công việc"
-        android:textColor="@color/textPrimary"
-        android:textColorHint="@color/textSecondary" />
+        android:hint="Tên công việc">
 
-    <Spinner
-        android:id="@+id/spinnerCategory"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edtTaskName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textCapSentences" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayoutCategory"
+        style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:entries="@array/category_array"
-        android:textColor="@color/textPrimary" />
+        android:layout_marginTop="16dp"
+        android:hint="Danh mục"
+        app:endIconMode="dropdown_menu">
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/spinnerCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="?attr/colorOutline"
+            android:focusable="false"
+            android:inputType="none"
+            android:padding="12dp"
+            android:popupBackground="?attr/colorSurface"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textColorHint="?android:attr/textColorSecondary" />
+    </com.google.android.material.textfield.TextInputLayout>
+
 </LinearLayout>

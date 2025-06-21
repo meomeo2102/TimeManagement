@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scroll_menu"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:id="@+id/menu_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:divider="?android:attr/dividerVertical"
+        android:showDividers="middle">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nâng cấp lên Pro"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Star Task"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Thể loại"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Chủ đề"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tiện ích"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Quyên góp"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ứng dụng Gia đình (AD)"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Phản hồi"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hỏi Đáp"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cài đặt"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:textColor="?android:attr/textColorPrimary" />
+
+    </LinearLayout>
+</ScrollView>

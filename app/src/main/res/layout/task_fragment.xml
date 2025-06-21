@@ -1,36 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center">
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    android:fillViewport="true"
+    android:padding="16dp">
 
     <LinearLayout
-        android:id="@+id/empty_state"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:gravity="center"
-        android:visibility="gone">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/empty_state_image" />
-
+        <!-- Tiêu đề hôm nay -->
         <TextView
+            android:id="@+id/today_title"
+            android:text="Hôm nay"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bắt đầu ngày đẹp với những niềm vui dành tặng cuộc ban."
-            android:textColor="@color/textSecondary"
-            android:textSize="16sp"
-            android:padding="16dp"
-            android:gravity="center" />
+            android:paddingBottom="4dp" />
 
+        <!-- Lời khuyến khích -->
+        <TextView
+            android:id="@+id/encouragement_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Bạn đã hoàn thành tất cả công việc hôm nay, thật chăm chỉ làm sao!"
+            android:textSize="16sp"
+            android:textStyle="italic"
+            android:textColor="@android:color/holo_blue_dark"
+            android:padding="12dp"
+            android:visibility="gone" />
+
+        <!-- Danh sách công việc hôm nay -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerToday"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Tiêu đề đã hoàn thành -->
+        <TextView
+            android:id="@+id/completed_title"
+            android:text="Đã hoàn thành"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="4dp"
+            android:visibility="gone" />
+
+        <!-- Danh sách đã hoàn thành -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerCompleted"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone" />
+
+        <!-- Empty state -->
+        <LinearLayout
+            android:id="@+id/empty_state"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:padding="24dp">
+
+            <ImageView
+                android:id="@+id/empty_image"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/empty_state_image"
+                android:layout_marginBottom="16dp"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:id="@+id/empty_text"
+                android:text="Hôm nay không có lịch trình gì sao?\nBấm vào + để cảm thấy bận rộn hơn nhé!"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="16sp"
+                android:textStyle="italic"
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</ScrollView>

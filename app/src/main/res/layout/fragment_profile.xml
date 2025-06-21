@@ -1,0 +1,34 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp">
+
+    <!-- Ảnh đại diện -->
+    <ImageView
+        android:id="@+id/user_avatar"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="16dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_launcher_foreground" />
+
+    <!-- Thông tin người dùng -->
+    <TextView
+        android:id="@+id/user_info"
+        android:text="Bạn chưa đăng nhập"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <!-- Nút đăng nhập -->
+    <Button
+        android:id="@+id/btn_google_login"
+        android:text="Đăng nhập với Google"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
