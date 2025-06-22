@@ -18,7 +18,9 @@ public class TaskViewModel extends AndroidViewModel {
         super(application);
         taskDao = TaskDatabase.getInstance(application).taskDao();
     }
-
+    public LiveData<List<Task>> getTasksThisWeek(long start, long end) {
+        return taskDao.getTasksThisWeek(start, end);
+    }
     public LiveData<List<Task>> getAllTasks() {
         return taskDao.getAllTasks();
     }

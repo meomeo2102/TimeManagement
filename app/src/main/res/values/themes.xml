@@ -5,7 +5,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryContainer">@color/colorPrimaryDark</item>
         <item name="colorOnPrimary">@android:color/white</item>
-
+        <item name="colorOnSurfaceVariant">@color/textHint</item>
         <item name="android:colorBackground">@color/colorAccent</item>
         <item name="colorSurface">@color/colorAccent</item>
         <item name="colorOnSurface">@color/textPrimary</item>
@@ -14,5 +14,9 @@
         <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
         <item name="android:windowBackground">@color/colorAccent</item>
     </style>
-
+    <style name="CustomDialogTheme" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorSurface">#FAFAFA</item> <!-- Nền dialog -->
+        <item name="colorOnSurface">#212121</item> <!-- Màu chữ -->
+        <item name="shapeAppearance">@style/ShapeAppearance.Material3.MediumComponent</item>
+    </style>
 </resources>

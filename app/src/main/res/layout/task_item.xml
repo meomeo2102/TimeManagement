@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="8dp"
-    android:layout_gravity="center"
     app:cardCornerRadius="16dp"
     app:cardElevation="4dp"
     app:strokeColor="?attr/colorSurfaceVariant"
@@ -22,23 +21,32 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Tên công việc"
-            android:textAppearance="?attr/textAppearanceTitleMedium"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:textAppearance="?attr/textAppearanceTitleMedium" />
 
         <TextView
-            android:id="@+id/taskTime"
+            android:id="@+id/textCreatedAt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Thời gian"
+            android:text="Ngày tạo: ..."
             android:textAppearance="?attr/textAppearanceBodySmall"
             android:textColor="?android:attr/textColorSecondary"
             android:layout_marginTop="4dp" />
 
+        <TextView
+            android:id="@+id/textDeadline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Deadline: ..."
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?android:attr/textColorSecondary"
+            android:layout_marginTop="2dp" />
+
+        <!-- Các nút -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginTop="12dp"
+            android:orientation="horizontal"
             android:gravity="center_vertical">
 
             <CheckBox
@@ -50,7 +58,6 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnEdit"
-                style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="SỬA"
@@ -61,13 +68,12 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDelete"
-                style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="XÓA"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
-                android:backgroundTint="?attr/colorError" />
+                android:backgroundTint="@android:color/holo_red_light" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

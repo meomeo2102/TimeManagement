@@ -1,19 +1,22 @@
 package com.example.timemanagement;
-
+import androidx.appcompat.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -62,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
                         .beginTransaction()
                         .replace(R.id.main_frame, selectedFragment)
                         .commit();
-                // ✅ bottom_nav luôn hiển thị trong TaskFragment
                 findViewById(R.id.bottom_nav).setVisibility(View.VISIBLE);
             }
             return true;
@@ -103,33 +105,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showAddTaskDialog() {
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_task, null);
-        EditText edtTaskName = dialogView.findViewById(R.id.edtTaskName);
-        MaterialAutoCompleteTextView spinnerCategory = dialogView.findViewById(R.id.spinnerCategory);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1,
-                getResources().getStringArray(R.array.category_array));
-        spinnerCategory.setAdapter(adapter);
-
-        new MaterialAlertDialogBuilder(this)
-                .setTitle("Thêm công việc")
-                .setView(dialogView)
-                .setPositiveButton("Lưu", (d, which) -> {
-                    String taskName = edtTaskName.getText().toString().trim();
-                    String category = spinnerCategory.getText().toString().trim();
-                    if (!taskName.isEmpty() && !category.isEmpty()) {
-                        Task task = new Task(taskName, System.currentTimeMillis(), category);
-                        executor.execute(() -> {
-                            db.taskDao().insert(task);
-                            runOnUiThread(this::reloadTasks);
-                        });
-                    } else {
-                        Toast.makeText(this, "Vui lòng nhập tên công việc và danh mục!", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton("Hủy", null)
-                .show();
+        AddTaskDialogFragment.newInstance().show(getSupportFragmentManager(), "AddTaskDialog");
     }
 
     public void editTask(Task task) {
@@ -153,13 +129,22 @@ public class MainActivity extends AppCompatActivity {
                     String category = spinnerCategory.getText().toString().trim();
                     if (!taskName.isEmpty() && !category.isEmpty()) {
                         executor.execute(() -> {
-                            Task updatedTask = new Task(taskName, task.getTimestamp(), category, task.isCompleted());
+                            Task updatedTask = new Task(
+                                    taskName,
+                                    task.getCreatedAt(),
+                                    category,
+                                    task.getDeadlineTimestamp()
+                            );
                             updatedTask.setId(task.getId());
+                            updatedTask.setCompleted(task.isCompleted());
+
                             db.taskDao().update(updatedTask);
                             runOnUiThread(this::reloadTasks);
                         });
                     } else {
-                        Toast.makeText(this, "Vui lòng nhập tên công việc và danh mục!", Toast.LENGTH_SHORT).show();
+                        runOnUiThread(() -> Toast.makeText(this,
+                                "Vui lòng nhập tên công việc và danh mục!",
+                                Toast.LENGTH_SHORT).show());
                     }
                 })
                 .setNegativeButton("Hủy", null)
@@ -175,5 +160,9 @@ public class MainActivity extends AppCompatActivity {
 
     public Executor getExecutor() {
         return executor;
+    }
+
+    public TaskViewModel getTaskViewModel() {
+        return new ViewModelProvider(this).get(TaskViewModel.class);
     }
 }

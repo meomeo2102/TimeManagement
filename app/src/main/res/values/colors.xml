@@ -4,7 +4,7 @@
     <color name="colorPrimary">#A8DADC</color>
     <color name="colorPrimaryDark">#457B9D</color>
     <color name="colorAccent">#F1FAEE</color>
-
+    <color name="textHint">#6C757D</color>
     <!-- Material 3 theme -->
     <color name="md_theme_primary">@color/colorPrimary</color>
     <color name="md_theme_primaryContainer">@color/colorPrimaryDark</color>

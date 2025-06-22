@@ -28,9 +28,9 @@ public class ProfileFragment extends Fragment {
 
     private TextView userInfo;
     private ImageView userAvatar;
-    private Button btnGoogleLogin;
-    private ActivityResultLauncher<Intent> googleSignInLauncher;
+    private Button btnGoogleLogin, btnLogout;
     private GoogleSignInClient googleSignInClient;
+    private ActivityResultLauncher<Intent> googleSignInLauncher;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -39,6 +39,7 @@ public class ProfileFragment extends Fragment {
         userInfo = view.findViewById(R.id.user_info);
         userAvatar = view.findViewById(R.id.user_avatar);
         btnGoogleLogin = view.findViewById(R.id.btn_google_login);
+        btnLogout = view.findViewById(R.id.btn_logout);
 
         // Cấu hình Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -47,7 +48,7 @@ public class ProfileFragment extends Fragment {
 
         googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso);
 
-        // Tạo launcher cho đăng nhập Google
+        // Khởi tạo launcher đăng nhập
         googleSignInLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -58,16 +59,26 @@ public class ProfileFragment extends Fragment {
                 }
         );
 
-        // Nếu đã đăng nhập
+        // Kiểm tra trạng thái đăng nhập
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(requireContext());
         if (account != null) {
             updateUI(account);
+        } else {
+            updateUI(null);
         }
 
-        // Nút đăng nhập
+        // Xử lý nút đăng nhập
         btnGoogleLogin.setOnClickListener(v -> {
             Intent signInIntent = googleSignInClient.getSignInIntent();
             googleSignInLauncher.launch(signInIntent);
+        });
+
+        // Xử lý nút đăng xuất
+        btnLogout.setOnClickListener(v -> {
+            googleSignInClient.signOut().addOnCompleteListener(task -> {
+                updateUI(null);
+                Toast.makeText(getContext(), "Đã đăng xuất", Toast.LENGTH_SHORT).show();
+            });
         });
 
         return view;
@@ -83,14 +94,22 @@ public class ProfileFragment extends Fragment {
     }
 
     private void updateUI(GoogleSignInAccount account) {
-        String info = "👤 " + account.getDisplayName() + "\n📧 " + account.getEmail();
-        userInfo.setText(info);
+        if (account != null) {
+            String info = "👤 " + account.getDisplayName() + "\n📧 " + account.getEmail();
+            userInfo.setText(info);
 
-        // Load avatar
-        Glide.with(this)
-                .load(account.getPhotoUrl())
-                .placeholder(R.drawable.ic_launcher_foreground)
-                .into(userAvatar);
-        btnGoogleLogin.setVisibility(View.GONE);
+            Glide.with(this)
+                    .load(account.getPhotoUrl())
+                    .placeholder(R.drawable.ic_launcher_foreground)
+                    .into(userAvatar);
+
+            btnGoogleLogin.setVisibility(View.GONE);
+            btnLogout.setVisibility(View.VISIBLE);
+        } else {
+            userInfo.setText("Bạn chưa đăng nhập");
+            userAvatar.setImageResource(R.drawable.ic_launcher_foreground);
+            btnGoogleLogin.setVisibility(View.VISIBLE);
+            btnLogout.setVisibility(View.GONE);
+        }
     }
 }
