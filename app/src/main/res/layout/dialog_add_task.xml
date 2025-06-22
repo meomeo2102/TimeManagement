@@ -8,6 +8,7 @@
     android:background="?attr/colorSurface"
     android:clipToPadding="false">
 
+    <!-- Tên công việc -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayoutTaskName"
         style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense"
@@ -22,6 +23,7 @@
             android:inputType="textCapSentences" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Danh mục -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayoutCategory"
         style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense"
@@ -43,5 +45,23 @@
             android:textColor="?android:attr/textColorPrimary"
             android:textColorHint="?android:attr/textColorSecondary" />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Thời gian -->
+    <TextView
+        android:id="@+id/txtDateTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Chưa chọn thời gian"
+        android:textColor="?android:attr/textColorPrimary"
+        android:padding="12dp"
+        android:layout_marginTop="16dp"
+        android:background="?android:attr/selectableItemBackground" />
+
+    <Button
+        android:id="@+id/btnPickDateTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chọn thời gian"
+        android:layout_marginTop="8dp" />
 
 </LinearLayout>

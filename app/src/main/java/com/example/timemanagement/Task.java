@@ -1,42 +1,71 @@
 package com.example.timemanagement;
 
-import androidx.room.Entity;
-import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
-
-@Entity(tableName = "tasks")
 public class Task {
+    private int id;
+    private String name;
+    private String timestamp; // dạng chuỗi: "yyyy-MM-dd HH:mm:ss"
+    private String category;
+    private boolean completed;
 
-    @PrimaryKey(autoGenerate = true)
-    public int id;
+    // Constructor mặc định (cần cho Retrofit hoặc Firebase)
+    public Task() {}
 
-    public String name;
-    public long timestamp;
-    public String category;
-    public boolean completed;
-
-    @Ignore
-    public Task(String name, long timestamp, String category) {
-        this.name = name;
-        this.timestamp = timestamp;
-        this.category = category;
-        this.completed = false;
-    }
-
-    public Task(String name, long timestamp, String category, boolean completed) {
+    // Constructor đầy đủ
+    public Task(int id, String name, String timestamp, String category, boolean completed) {
+        this.id = id;
         this.name = name;
         this.timestamp = timestamp;
         this.category = category;
         this.completed = completed;
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    // ✅ Constructor rút gọn: name, timestamp, category
+    public Task(String name, String timestamp, String category) {
+        this.name = name;
+        this.timestamp = timestamp;
+        this.category = category;
+        this.completed = false; // mặc định chưa hoàn thành
+    }
 
-    public String getName() { return name; }
-    public long getTimestamp() { return timestamp; }
-    public String getCategory() { return category; }
+    // Getter và Setter
 
-    public boolean isCompleted() { return completed; }
-    public void setCompleted(boolean completed) { this.completed = completed; }
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
 }
