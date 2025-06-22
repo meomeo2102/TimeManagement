@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
+import android.util.Log;
+
 
 public class TaskFragment extends Fragment {
 
@@ -77,10 +79,25 @@ public class TaskFragment extends Fragment {
             List<Task> done = new ArrayList<>();
 
             for (Task task : tasks) {
-                if ("Tất cả".equals(category) || category.equals(task.getCategory())) {
-                    if (task.isCompleted()) done.add(task); else today.add(task);
+                // ✅ In log kiểm tra từng task và danh mục đang lọc
+                Log.d("FILTER_DEBUG", "task = " + task.getName()
+                        + ", task.category = " + task.getCategory()
+                        + ", selected = " + category);
+
+                // ✅ So sánh không phân biệt chữ hoa/thường, tránh lỗi khoảng trắng
+                if ("Tất cả".equalsIgnoreCase(category.trim()) ||
+                        category.trim().equalsIgnoreCase(task.getCategory().trim())) {
+                    if (task.isCompleted()) {
+                        done.add(task);
+                    } else {
+                        today.add(task);
+                    }
                 }
             }
+
+            // ✅ Log kết quả lọc
+            Log.d("FILTER_RESULT", "Task chưa hoàn thành: " + today.size()
+                    + ", Task đã hoàn thành: " + done.size());
 
             adapterToday.setTasks(today);
             adapterCompleted.setTasks(done);
@@ -95,7 +112,7 @@ public class TaskFragment extends Fragment {
             if (today.isEmpty() && done.isEmpty()) {
                 emptyState.setVisibility(View.VISIBLE);
                 emptyText.setText("Không có nhiệm vụ nào trong mục này.\nBấm + để tạo công việc mới!");
-                emptyImage.setImageResource(R.drawable.empty_state_image); // hoặc tùy theo danh mục
+                emptyImage.setImageResource(R.drawable.empty_state_image);
             } else {
                 emptyState.setVisibility(View.GONE);
             }

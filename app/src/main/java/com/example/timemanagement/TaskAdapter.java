@@ -12,7 +12,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -44,8 +46,17 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         Task task = taskList.get(position);
         holder.taskName.setText(task.getName());
 
-        holder.taskTime.setText(new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-                .format(task.getTimestamp()));
+        // ✅ Sửa lỗi format timestamp chuỗi
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+
+            Date date = inputFormat.parse(task.getTimestamp());
+            String formatted = outputFormat.format(date);
+            holder.taskTime.setText(formatted);
+        } catch (ParseException e) {
+            holder.taskTime.setText(task.getTimestamp()); // fallback nếu lỗi
+        }
 
         holder.checkboxDone.setOnCheckedChangeListener(null);
         holder.checkboxDone.setChecked(task.isCompleted());
@@ -58,7 +69,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 ? holder.taskName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
                 : holder.taskName.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
 
-        // ✅ Đã chỉnh sửa để truyền callback đúng
         holder.checkboxDone.setOnCheckedChangeListener((buttonView, isChecked) -> {
             task.setCompleted(isChecked);
             taskViewModel.updateTask(task, success -> {
@@ -71,7 +81,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         holder.taskTime.setVisibility(task.isCompleted() ? View.VISIBLE : View.GONE);
 
         holder.btnEdit.setOnClickListener(v -> activity.editTask(task));
-
         holder.btnDelete.setOnClickListener(v -> taskViewModel.deleteTask(task));
     }
 

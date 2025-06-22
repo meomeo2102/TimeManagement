@@ -45,7 +45,8 @@ public class RemoteTaskViewModel extends ViewModel {
     }
 
     public void insertTask(Task task, ResultCallback<Boolean> callback) {
-        Log.d("DEBUG_TASK", "Đang gửi: name = " + task.getName()
+        Log.d("DEBUG_TASK", "Gửi task: "
+                + "name = " + task.getName()
                 + ", timestamp = " + task.getTimestamp()
                 + ", category = " + task.getCategory());
 
@@ -53,7 +54,6 @@ public class RemoteTaskViewModel extends ViewModel {
                 .enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
-                        Log.d("API_INSERT", "Response code: " + response.code());
                         callback.onResult(response.isSuccessful());
                         if (response.isSuccessful()) fetchAllTasks();
                     }

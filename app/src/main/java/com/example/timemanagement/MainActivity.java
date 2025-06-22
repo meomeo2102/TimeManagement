@@ -115,16 +115,23 @@ public class MainActivity extends AppCompatActivity {
             if (!taskName.isEmpty() && !category.isEmpty() && !timestampText.equals("Chưa chọn thời gian")) {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                 try {
-                    long timestamp = sdf.parse(timestampText).getTime();
-                    Task task = new Task(taskName, timestamp, category);
+                    // Không cần parse sang long nữa
+                    Task task = new Task();
+                    task.setName(taskName);
+                    task.setTimestamp(timestampText); // timestamp là String dạng "yyyy-MM-dd HH:mm:ss"
+                    task.setCategory(category);
+                    task.setCompleted(false);
+
                     viewModel.insertTask(task, success -> {
                         if (success) runOnUiThread(this::reloadTasks);
-                        else
-                            runOnUiThread(() -> Toast.makeText(this, "Lưu thất bại!", Toast.LENGTH_SHORT).show());
+                        else runOnUiThread(() ->
+                                Toast.makeText(this, "Lưu thất bại!", Toast.LENGTH_SHORT).show()
+                        );
                     });
-                } catch (ParseException e) {
-                    Toast.makeText(this, "Lỗi định dạng thời gian!", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Toast.makeText(this, "Lỗi khi tạo task!", Toast.LENGTH_SHORT).show();
                 }
+
             } else {
                 Toast.makeText(this, "Vui lòng nhập đủ thông tin!", Toast.LENGTH_SHORT).show();
             }
@@ -135,25 +142,47 @@ public class MainActivity extends AppCompatActivity {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_task, null);
         EditText edtTaskName = dialogView.findViewById(R.id.edtTaskName);
         MaterialAutoCompleteTextView spinnerCategory = dialogView.findViewById(R.id.spinnerCategory);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.category_array));
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_list_item_1,
+                getResources().getStringArray(R.array.category_array)
+        );
         spinnerCategory.setAdapter(adapter);
+
         edtTaskName.setText(task.getName());
         spinnerCategory.setText(task.getCategory(), false);
-        new MaterialAlertDialogBuilder(this).setTitle("Sửa công việc").setView(dialogView).setPositiveButton("Lưu", (d, which) -> {
-            String taskName = edtTaskName.getText().toString().trim();
-            String category = spinnerCategory.getText().toString().trim();
-            if (!taskName.isEmpty() && !category.isEmpty()) {
-                Task updatedTask = new Task(taskName, task.getTimestamp(), category, task.isCompleted());
-                updatedTask.setId(task.getId());
-                viewModel.updateTask(updatedTask, success -> {
-                    if (success) runOnUiThread(this::reloadTasks);
-                    else
-                        runOnUiThread(() -> Toast.makeText(this, "Cập nhật thất bại!", Toast.LENGTH_SHORT).show());
-                });
-            } else {
-                Toast.makeText(this, "Vui lòng nhập tên công việc và danh mục!", Toast.LENGTH_SHORT).show();
-            }
-        }).setNegativeButton("Hủy", null).show();
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Sửa công việc")
+                .setView(dialogView)
+                .setPositiveButton("Lưu", (dialog, which) -> {
+                    String taskName = edtTaskName.getText().toString().trim();
+                    String category = spinnerCategory.getText().toString().trim();
+
+                    if (!taskName.isEmpty() && !category.isEmpty()) {
+                        Task updatedTask = new Task();
+                        updatedTask.setId(task.getId());
+                        updatedTask.setName(taskName);
+                        updatedTask.setTimestamp(task.getTimestamp()); // giờ là String
+                        updatedTask.setCategory(category);
+                        updatedTask.setCompleted(task.isCompleted());
+
+                        viewModel.updateTask(updatedTask, success -> {
+                            if (success) {
+                                runOnUiThread(this::reloadTasks);
+                            } else {
+                                runOnUiThread(() ->
+                                        Toast.makeText(this, "Cập nhật thất bại!", Toast.LENGTH_SHORT).show()
+                                );
+                            }
+                        });
+                    } else {
+                        Toast.makeText(this, "Vui lòng nhập tên công việc và danh mục!", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 
     public void reloadTasks() {

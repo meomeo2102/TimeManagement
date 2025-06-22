@@ -13,7 +13,7 @@ public interface TaskApi {
     @POST("insert_task.php")
     Call<Void> insertTask(
             @Field("name") String name,
-            @Field("timestamp") long timestamp,
+            @Field("timestamp") String timestamp,
             @Field("category") String category
     );
 
@@ -22,7 +22,7 @@ public interface TaskApi {
     Call<Void> updateTask(
             @Field("id") int id,
             @Field("name") String name,
-            @Field("timestamp") long timestamp,
+            @Field("timestamp") String timestamp,
             @Field("category") String category,
             @Field("completed") boolean completed
     );
