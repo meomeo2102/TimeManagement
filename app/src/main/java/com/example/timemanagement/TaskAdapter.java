@@ -46,7 +46,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         Task task = taskList.get(position);
         holder.taskName.setText(task.getName());
 
-        // ✅ Sửa lỗi format timestamp chuỗi
+        // Hiển thị và định dạng thời gian
         try {
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
             SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
@@ -55,19 +55,27 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             String formatted = outputFormat.format(date);
             holder.taskTime.setText(formatted);
         } catch (ParseException e) {
-            holder.taskTime.setText(task.getTimestamp()); // fallback nếu lỗi
+            holder.taskTime.setText(task.getTimestamp());
         }
 
+        holder.taskTime.setVisibility(View.VISIBLE);
+
+        // Reset listener trước khi gán sự kiện mới
         holder.checkboxDone.setOnCheckedChangeListener(null);
         holder.checkboxDone.setChecked(task.isCompleted());
 
-        holder.itemView.setBackgroundResource(task.isCompleted()
-                ? R.drawable.bg_task_card_done
-                : R.drawable.bg_task_card);
-
+        // Gạch ngang nếu hoàn thành
         holder.taskName.setPaintFlags(task.isCompleted()
                 ? holder.taskName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
                 : holder.taskName.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+
+        // Làm mờ toàn bộ item nếu hoàn thành
+        holder.itemView.setAlpha(task.isCompleted() ? 0.5f : 1.0f);
+
+        // Đổi nền card nếu muốn (tuỳ chỉnh drawable nếu cần)
+        holder.itemView.setBackgroundResource(task.isCompleted()
+                ? R.drawable.bg_task_card_done
+                : R.drawable.bg_task_card);
 
         holder.checkboxDone.setOnCheckedChangeListener((buttonView, isChecked) -> {
             task.setCompleted(isChecked);
@@ -77,8 +85,6 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 }
             });
         });
-
-        holder.taskTime.setVisibility(task.isCompleted() ? View.VISIBLE : View.GONE);
 
         holder.btnEdit.setOnClickListener(v -> activity.editTask(task));
         holder.btnDelete.setOnClickListener(v -> taskViewModel.deleteTask(task));
