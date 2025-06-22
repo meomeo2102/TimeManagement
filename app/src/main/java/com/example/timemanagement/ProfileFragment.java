@@ -40,14 +40,15 @@ public class ProfileFragment extends Fragment {
         userAvatar = view.findViewById(R.id.user_avatar);
         btnGoogleLogin = view.findViewById(R.id.btn_google_login);
 
-        // Cấu hình Google Sign-In
+        // Cấu hình Google Sign-In với Web Client ID
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
+                .requestIdToken("820901138822-bahq841k4a63povv1o0kmg3gdvjtj4tg.apps.googleusercontent.com")
                 .build();
 
         googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso);
 
-        // Tạo launcher cho đăng nhập Google
+        // Đăng ký launcher
         googleSignInLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -64,7 +65,7 @@ public class ProfileFragment extends Fragment {
             updateUI(account);
         }
 
-        // Nút đăng nhập
+        // Bắt đầu đăng nhập
         btnGoogleLogin.setOnClickListener(v -> {
             Intent signInIntent = googleSignInClient.getSignInIntent();
             googleSignInLauncher.launch(signInIntent);
@@ -76,6 +77,14 @@ public class ProfileFragment extends Fragment {
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+
+            // 👉 Lấy ID token để gửi về server nếu cần
+            String idToken = account.getIdToken();
+            if (idToken != null) {
+                Toast.makeText(getContext(), "Token ID: " + idToken.substring(0, 10) + "...", Toast.LENGTH_SHORT).show();
+                // TODO: Gửi token này về backend qua Retrofit/Volley nếu bạn muốn xác thực với server
+            }
+
             updateUI(account);
         } catch (ApiException e) {
             Toast.makeText(getContext(), "Đăng nhập thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -86,11 +95,11 @@ public class ProfileFragment extends Fragment {
         String info = "👤 " + account.getDisplayName() + "\n📧 " + account.getEmail();
         userInfo.setText(info);
 
-        // Load avatar
         Glide.with(this)
                 .load(account.getPhotoUrl())
                 .placeholder(R.drawable.ic_launcher_foreground)
                 .into(userAvatar);
+
         btnGoogleLogin.setVisibility(View.GONE);
     }
 }

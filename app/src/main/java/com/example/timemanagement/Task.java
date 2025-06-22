@@ -1,21 +1,27 @@
 package com.example.timemanagement;
 
-import androidx.room.Entity;
-import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
+import com.google.gson.annotations.SerializedName;
 
-@Entity(tableName = "tasks")
 public class Task {
 
-    @PrimaryKey(autoGenerate = true)
-    public int id;
+    @SerializedName("id")
+    private int id;
 
-    public String name;
-    public long timestamp;
-    public String category;
-    public boolean completed;
+    @SerializedName("name")
+    private String name;
 
-    @Ignore
+    @SerializedName("timestamp")
+    private long timestamp;
+
+    @SerializedName("category")
+    private String category;
+
+    @SerializedName("completed")
+    private boolean completed;
+
+    // Constructors
+    public Task() {}
+
     public Task(String name, long timestamp, String category) {
         this.name = name;
         this.timestamp = timestamp;
@@ -30,13 +36,52 @@ public class Task {
         this.completed = completed;
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public Task(int id, String name, long timestamp, String category, boolean completed) {
+        this.id = id;
+        this.name = name;
+        this.timestamp = timestamp;
+        this.category = category;
+        this.completed = completed;
+    }
 
-    public String getName() { return name; }
-    public long getTimestamp() { return timestamp; }
-    public String getCategory() { return category; }
+    // Getter & Setter
+    public int getId() {
+        return id;
+    }
 
-    public boolean isCompleted() { return completed; }
-    public void setCompleted(boolean completed) { this.completed = completed; }
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
 }

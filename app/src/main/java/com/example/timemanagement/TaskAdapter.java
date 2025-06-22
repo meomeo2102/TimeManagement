@@ -1,14 +1,17 @@
 package com.example.timemanagement;
 
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
@@ -17,9 +20,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     private List<Task> taskList;
     private final MainActivity activity;
-    private final TaskViewModel taskViewModel;
+    private final RemoteTaskViewModel taskViewModel;
 
-    public TaskAdapter(MainActivity activity, TaskViewModel taskViewModel) {
+    public TaskAdapter(MainActivity activity, RemoteTaskViewModel taskViewModel) {
         this.activity = activity;
         this.taskViewModel = taskViewModel;
     }
@@ -44,11 +47,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         holder.taskTime.setText(new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
                 .format(task.getTimestamp()));
 
-        // Ngăn callback vô hạn
         holder.checkboxDone.setOnCheckedChangeListener(null);
         holder.checkboxDone.setChecked(task.isCompleted());
 
-        // Set màu & gạch nếu hoàn thành
         holder.itemView.setBackgroundResource(task.isCompleted()
                 ? R.drawable.bg_task_card_done
                 : R.drawable.bg_task_card);
@@ -57,30 +58,21 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 ? holder.taskName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
                 : holder.taskName.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
 
-        //Checkbox hoàn thành
+        // ✅ Đã chỉnh sửa để truyền callback đúng
         holder.checkboxDone.setOnCheckedChangeListener((buttonView, isChecked) -> {
             task.setCompleted(isChecked);
-            new Thread(() -> {
-                taskViewModel.updateTask(task);
-                activity.runOnUiThread(activity::reloadTasks); // Reload UI
-            }).start();
+            taskViewModel.updateTask(task, success -> {
+                if (!success) {
+                    Log.e("TaskAdapter", "Cập nhật trạng thái task thất bại");
+                }
+            });
         });
-        if (task.isCompleted()) {
-            holder.taskTime.setVisibility(View.VISIBLE);
-        } else {
-            holder.taskTime.setVisibility(View.GONE);
-        }
 
-        //Nút sửa
+        holder.taskTime.setVisibility(task.isCompleted() ? View.VISIBLE : View.GONE);
+
         holder.btnEdit.setOnClickListener(v -> activity.editTask(task));
 
-        //Nút xóa
-        holder.btnDelete.setOnClickListener(v -> {
-            new Thread(() -> {
-                taskViewModel.deleteTask(task);
-                activity.runOnUiThread(activity::reloadTasks); // Reload UI
-            }).start();
-        });
+        holder.btnDelete.setOnClickListener(v -> taskViewModel.deleteTask(task));
     }
 
     @Override
