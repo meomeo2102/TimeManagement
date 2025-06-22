@@ -17,6 +17,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Tên công việc -->
         <TextView
             android:id="@+id/taskName"
             android:layout_width="wrap_content"
@@ -25,15 +26,17 @@
             android:textAppearance="?attr/textAppearanceTitleMedium"
             android:textColor="?android:attr/textColorPrimary" />
 
+        <!-- Ngày giờ -->
         <TextView
             android:id="@+id/taskTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Thời gian"
+            android:text="dd/MM/yyyy HH:mm"
             android:textAppearance="?attr/textAppearanceBodySmall"
             android:textColor="?android:attr/textColorSecondary"
             android:layout_marginTop="4dp" />
 
+        <!-- Hành động -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -41,13 +44,15 @@
             android:layout_marginTop="12dp"
             android:gravity="center_vertical">
 
+            <!-- Checkbox hoàn thành -->
             <CheckBox
                 android:id="@+id/checkboxDone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:buttonTint="?attr/colorPrimary" />
+                android:buttonTint="@color/checkbox_done_selector" />
 
+            <!-- Nút sửa -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnEdit"
                 style="@style/Widget.Material3.Button.TextButton"
@@ -59,6 +64,7 @@
                 android:backgroundTint="?attr/colorPrimary"
                 android:layout_marginEnd="8dp" />
 
+            <!-- Nút xoá -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDelete"
                 style="@style/Widget.Material3.Button.TextButton"
