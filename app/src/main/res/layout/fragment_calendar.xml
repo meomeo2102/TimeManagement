@@ -1,15 +1,60 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/calendarLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
-    android:padding="24dp">
+    android:padding="16dp">
 
+    <!-- Nút thu gọn / mở rộng -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="horizontal"
+        android:layout_marginBottom="4dp">
+
+        <ImageButton
+            android:id="@+id/btnToggleCalendar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Toggle Calendar"
+            android:src="@drawable/ic_arrow_drop_down" />
+    </LinearLayout>
+
+    <!-- Lịch -->
+    <CalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Tiêu đề -->
     <TextView
-        android:id="@+id/fragment_text"
+        android:id="@+id/tvTitleCalendar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textColor="?android:attr/textColorPrimary"
-        android:text="Lịch công việc" />
+        android:text="Nhiệm vụ trong tuần"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Danh sách nhiệm vụ -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerCalendarTasks"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Thông báo khi không có nhiệm vụ -->
+    <TextView
+        android:id="@+id/tvNoTask"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Không có nhiệm vụ nào"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:textColor="@android:color/darker_gray"
+        android:layout_marginTop="12dp"
+        android:visibility="gone" />
 </LinearLayout>

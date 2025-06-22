@@ -7,9 +7,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -41,44 +44,42 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         Task task = taskList.get(position);
         holder.taskName.setText(task.getName());
 
-        holder.taskTime.setText(new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-                .format(task.getTimestamp()));
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm dd/MM/yyyy", Locale.getDefault());
 
-        // Ngăn callback vô hạn
-        holder.checkboxDone.setOnCheckedChangeListener(null);
-        holder.checkboxDone.setChecked(task.isCompleted());
+        String createdText = "📅 Ngày tạo: " + sdf.format(new Date(task.getCreatedAt()));
+        String deadlineText = "⏰ Deadline: " + sdf.format(new Date(task.getDeadlineTimestamp()));
 
-        // Set màu & gạch nếu hoàn thành
-        holder.itemView.setBackgroundResource(task.isCompleted()
-                ? R.drawable.bg_task_card_done
-                : R.drawable.bg_task_card);
+        holder.textCreatedAt.setText(createdText);
+        holder.textDeadline.setText(deadlineText);
 
+        // Gạch ngang nếu đã hoàn thành
         holder.taskName.setPaintFlags(task.isCompleted()
                 ? holder.taskName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
                 : holder.taskName.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
 
-        //Checkbox hoàn thành
+        holder.itemView.setBackgroundResource(task.isCompleted()
+                ? R.drawable.bg_task_card_done
+                : R.drawable.bg_task_card);
+
+        // CheckBox
+        holder.checkboxDone.setOnCheckedChangeListener(null);
+        holder.checkboxDone.setChecked(task.isCompleted());
         holder.checkboxDone.setOnCheckedChangeListener((buttonView, isChecked) -> {
             task.setCompleted(isChecked);
             new Thread(() -> {
                 taskViewModel.updateTask(task);
-                activity.runOnUiThread(activity::reloadTasks); // Reload UI
+                activity.runOnUiThread(activity::reloadTasks);
             }).start();
         });
-        if (task.isCompleted()) {
-            holder.taskTime.setVisibility(View.VISIBLE);
-        } else {
-            holder.taskTime.setVisibility(View.GONE);
-        }
 
-        //Nút sửa
+        // Nút sửa
         holder.btnEdit.setOnClickListener(v -> activity.editTask(task));
 
-        //Nút xóa
+        // Nút xoá
         holder.btnDelete.setOnClickListener(v -> {
             new Thread(() -> {
                 taskViewModel.deleteTask(task);
-                activity.runOnUiThread(activity::reloadTasks); // Reload UI
+                activity.runOnUiThread(activity::reloadTasks);
             }).start();
         });
     }
@@ -89,14 +90,15 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     }
 
     static class TaskViewHolder extends RecyclerView.ViewHolder {
-        TextView taskName, taskTime;
+        TextView taskName, textCreatedAt, textDeadline;
         CheckBox checkboxDone;
         Button btnEdit, btnDelete;
 
         public TaskViewHolder(@NonNull View itemView) {
             super(itemView);
             taskName = itemView.findViewById(R.id.taskName);
-            taskTime = itemView.findViewById(R.id.taskTime);
+            textCreatedAt = itemView.findViewById(R.id.textCreatedAt);
+            textDeadline = itemView.findViewById(R.id.textDeadline);
             checkboxDone = itemView.findViewById(R.id.checkboxDone);
             btnEdit = itemView.findViewById(R.id.btnEdit);
             btnDelete = itemView.findViewById(R.id.btnDelete);

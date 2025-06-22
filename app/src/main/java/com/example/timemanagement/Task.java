@@ -1,42 +1,46 @@
 package com.example.timemanagement;
 
 import androidx.room.Entity;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "tasks")
+@Entity
 public class Task {
 
     @PrimaryKey(autoGenerate = true)
-    public int id;
+    private int id;
 
-    public String name;
-    public long timestamp;
-    public String category;
-    public boolean completed;
+    private String name;
+    private String category;
+    private boolean completed;
 
-    @Ignore
-    public Task(String name, long timestamp, String category) {
+    private long createdAt;         // thời điểm tạo task
+    private long deadlineTimestamp; // deadline
+
+    public Task(String name, long createdAt, String category, long deadlineTimestamp) {
         this.name = name;
-        this.timestamp = timestamp;
+        this.createdAt = createdAt;
         this.category = category;
+        this.deadlineTimestamp = deadlineTimestamp;
         this.completed = false;
     }
 
-    public Task(String name, long timestamp, String category, boolean completed) {
-        this.name = name;
-        this.timestamp = timestamp;
-        this.category = category;
-        this.completed = completed;
-    }
+    // Getter & Setter
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
     public String getName() { return name; }
-    public long getTimestamp() { return timestamp; }
+    public void setName(String name) { this.name = name; }
+
     public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 
     public boolean isCompleted() { return completed; }
     public void setCompleted(boolean completed) { this.completed = completed; }
+
+    public long getCreatedAt() { return createdAt; }
+    public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
+
+    public long getDeadlineTimestamp() { return deadlineTimestamp; }
+    public void setDeadlineTimestamp(long deadlineTimestamp) { this.deadlineTimestamp = deadlineTimestamp; }
 }
