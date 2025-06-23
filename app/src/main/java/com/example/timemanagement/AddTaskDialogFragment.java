@@ -1,5 +1,6 @@
 package com.example.timemanagement;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
@@ -7,7 +8,10 @@ import android.view.*;
 import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresPermission;
 import androidx.fragment.app.DialogFragment;
+
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.*;
 import java.text.SimpleDateFormat;
@@ -54,6 +58,7 @@ public class AddTaskDialogFragment extends DialogFragment {
             );
         }
     }
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -171,7 +176,7 @@ public class AddTaskDialogFragment extends DialogFragment {
             } else {
                 Task task = new Task(taskName, createdAt, category, deadlineMillis);
                 task.setCompleted(isCompleted);
-
+                task.setOwner(getCurrentUser());
                 executor.execute(() -> {
                     db.taskDao().insert(task);
                     requireActivity().runOnUiThread(() -> {
@@ -189,5 +194,15 @@ public class AddTaskDialogFragment extends DialogFragment {
 
     private String formatDateTime(long millis) {
         return new SimpleDateFormat("HH:mm dd/MM/yyyy", Locale.getDefault()).format(new Date(millis));
+    }
+    private String getCurrentUser() {
+        String localUser = AuthUtils.SessionManager.getLoggedInUsername(requireContext());
+        if (localUser != null) return localUser;
+
+        GoogleSignInAccount acc = com.google.android.gms.auth.api.signin
+                .GoogleSignIn.getLastSignedInAccount(requireContext());
+        if (acc != null) return acc.getEmail();
+
+        return "guest";
     }
 }

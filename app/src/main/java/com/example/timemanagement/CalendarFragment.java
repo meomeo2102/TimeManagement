@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timemanagement.TaskViewModel;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -29,7 +31,13 @@ public class CalendarFragment extends Fragment {
     private TextView tvTitle, tvNoTask;
     private ImageButton btnToggle;
     private boolean isExpanded = true;
+    private String getCurrentUser() {
+        GoogleSignInAccount acc = GoogleSignIn.getLastSignedInAccount(requireContext());
+        if (acc != null) return acc.getEmail();
 
+        String local = AuthUtils.SessionManager.getLoggedInUsername(requireContext());
+        return local != null ? local : "guest";
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -92,10 +100,12 @@ public class CalendarFragment extends Fragment {
     }
 
     private void loadTasks(long start, long end) {
-        taskViewModel.getTasksThisWeek(start, end).observe(getViewLifecycleOwner(), tasks -> {
-            adapter.setTasks(tasks);
-            tvNoTask.setVisibility(tasks == null || tasks.isEmpty() ? View.VISIBLE : View.GONE);
-        });
+        String currentUser = getCurrentUser();
+        taskViewModel.getTasksThisWeek(currentUser, start, end)
+                .observe(getViewLifecycleOwner(), tasks -> {
+                    adapter.setTasks(tasks);
+                    tvNoTask.setVisibility(tasks == null || tasks.isEmpty() ? View.VISIBLE : View.GONE);
+                });
     }
 
     private long[] getWeekRangeFrom(long millis) {

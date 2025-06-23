@@ -10,7 +10,7 @@ public class Task implements Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
-
+    public String owner;
     private String name;
     private String category;
     private boolean completed;
@@ -30,6 +30,8 @@ public class Task implements Serializable {
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
+    public void setOwner(String owner) { this.owner = owner; }
+    public String getOwner() { return owner; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

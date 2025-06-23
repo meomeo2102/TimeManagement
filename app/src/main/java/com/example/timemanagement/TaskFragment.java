@@ -1,25 +1,15 @@
 package com.example.timemanagement;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
+import android.view.*;
+import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.lifecycle.*;
+import androidx.recyclerview.widget.*;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class TaskFragment extends Fragment {
 
@@ -27,43 +17,37 @@ public class TaskFragment extends Fragment {
     private TaskAdapter adapterToday, adapterCompleted;
     private String mode = "overview";
     private String category = "Tất cả";
+    private String owner = "guest";
+
     private TextView todayTitle, encouragementText, emptyText;
     private ImageView emptyImage;
     private RecyclerView recyclerToday, recyclerCompleted;
     private LinearLayout emptyState;
     private View rootView;
 
-    public static TaskFragment newInstance(String mode, String category) {
+    public static TaskFragment newInstance(String mode, String category, String owner) {
         TaskFragment fragment = new TaskFragment();
         Bundle args = new Bundle();
         args.putString("mode", mode);
         args.putString("category", category);
+        args.putString("owner", owner);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.task_fragment, container, false);
-// TextView userInfo = view.findViewById(R.id.user_info);
-// GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(requireContext());
-// if (account != null) {
-//     String info = "Tên: " + account.getDisplayName() + "\nEmail: " + account.getEmail();
-//     userInfo.setText(info);
-// }
-
-
-        return view;
+        return inflater.inflate(R.layout.task_fragment, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        this.rootView = view;
+        rootView = view;
 
         if (getArguments() != null) {
             mode = getArguments().getString("mode", "overview");
             category = getArguments().getString("category", "Tất cả");
+            owner = getArguments().getString("owner", "guest");
         }
 
         recyclerToday = view.findViewById(R.id.recyclerToday);
@@ -85,15 +69,16 @@ public class TaskFragment extends Fragment {
         recyclerToday.setAdapter(adapterToday);
         recyclerCompleted.setAdapter(adapterCompleted);
 
-        observeTasks();
+        loadTasksForOwner(owner);
     }
 
-    private void observeTasks() {
-        if ("category".equals(mode) && !"Tất cả".equals(category)) {
-            viewModel.getTasksByCategory(category).observe(getViewLifecycleOwner(), this::updateTasks);
-        } else {
-            viewModel.getAllTasks().observe(getViewLifecycleOwner(), this::updateTasks);
-        }
+    private void loadTasksForOwner(String currentUser) {
+        TaskDao dao = TaskDatabase.getInstance(requireContext()).taskDao();
+        LiveData<List<Task>> liveData = "category".equals(mode) && !"Tất cả".equals(category)
+                ? dao.getTasksByCategory(currentUser, category)
+                : dao.getTasksByOwner(currentUser);
+
+        liveData.observe(getViewLifecycleOwner(), this::updateTasks);
     }
 
     private void updateTasks(List<Task> tasks) {
@@ -101,49 +86,31 @@ public class TaskFragment extends Fragment {
         List<Task> completedTasks = new ArrayList<>();
 
         for (Task task : tasks) {
-            if (task.isCompleted()) {
-                completedTasks.add(task);
-            } else {
-                todayTasks.add(task);
-            }
+            if (task.isCompleted()) completedTasks.add(task);
+            else todayTasks.add(task);
         }
 
         adapterToday.setTasks(todayTasks);
         adapterCompleted.setTasks(completedTasks);
 
-        boolean hasCompleted = !completedTasks.isEmpty();
-        recyclerCompleted.setVisibility(hasCompleted ? View.VISIBLE : View.GONE);
-        rootView.findViewById(R.id.completed_title).setVisibility(hasCompleted ? View.VISIBLE : View.GONE);
+        recyclerCompleted.setVisibility(completedTasks.isEmpty() ? View.GONE : View.VISIBLE);
+        rootView.findViewById(R.id.completed_title)
+                .setVisibility(completedTasks.isEmpty() ? View.GONE : View.VISIBLE);
 
-        boolean hasToday = !todayTasks.isEmpty();
-        todayTitle.setVisibility(hasToday ? View.VISIBLE : View.GONE);
-        encouragementText.setVisibility(!hasToday && hasCompleted ? View.VISIBLE : View.GONE);
+        todayTitle.setVisibility(todayTasks.isEmpty() ? View.GONE : View.VISIBLE);
+        encouragementText.setVisibility(todayTasks.isEmpty() && !completedTasks.isEmpty() ? View.VISIBLE : View.GONE);
 
-        boolean showEmpty = todayTasks.isEmpty() && completedTasks.isEmpty();
-        if (showEmpty) {
+        if (todayTasks.isEmpty() && completedTasks.isEmpty()) {
             emptyState.setVisibility(View.VISIBLE);
-
             if (!"Tất cả".equals(category)) {
                 emptyText.setText("Không có nhiệm vụ nào trong danh mục này.\nNhấp vào + để tạo nhiệm vụ của bạn");
-
                 switch (category) {
-                    case "Công việc":
-                        emptyImage.setImageResource(R.drawable.empty_state_work);
-                        break;
-                    case "Cá nhân":
-                        emptyImage.setImageResource(R.drawable.empty_state_personal);
-                        break;
-                    case "Danh sách yêu thích":
-                        emptyImage.setImageResource(R.drawable.empty_state_favorites);
-                        break;
-                    case "Ngày sinh nhật":
-                        emptyImage.setImageResource(R.drawable.empty_state_birthday);
-                        break;
-                    default:
-                        emptyImage.setImageResource(R.drawable.empty_state_image);
-                        break;
+                    case "Công việc": emptyImage.setImageResource(R.drawable.empty_state_work); break;
+                    case "Cá nhân": emptyImage.setImageResource(R.drawable.empty_state_personal); break;
+                    case "Danh sách yêu thích": emptyImage.setImageResource(R.drawable.empty_state_favorites); break;
+                    case "Ngày sinh nhật": emptyImage.setImageResource(R.drawable.empty_state_birthday); break;
+                    default: emptyImage.setImageResource(R.drawable.empty_state_image); break;
                 }
-
             } else {
                 emptyText.setText("Hôm nay không có lịch trình gì sao?\nBấm vào + để cảm thấy bận rộn hơn nhé!");
                 emptyImage.setImageResource(R.drawable.empty_state_image);
@@ -151,8 +118,5 @@ public class TaskFragment extends Fragment {
         } else {
             emptyState.setVisibility(View.GONE);
         }
-    }
-    public void refreshTasks() {
-        observeTasks();
     }
 }

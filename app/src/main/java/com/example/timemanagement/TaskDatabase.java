@@ -4,14 +4,14 @@ import android.content.Context;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
-import androidx.room.TypeConverters;
 
-@Database(entities = {Task.class}, version = 1)
+@Database(entities = {Task.class, UserModel.User.class}, version = 2)
 public abstract class TaskDatabase extends RoomDatabase {
 
     private static TaskDatabase instance;
 
     public abstract TaskDao taskDao();
+    public abstract UserModel.UserDao userDao();
 
     public static synchronized TaskDatabase getInstance(Context context) {
         if (instance == null) {

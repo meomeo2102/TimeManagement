@@ -18,16 +18,45 @@ public class TaskViewModel extends AndroidViewModel {
         super(application);
         taskDao = TaskDatabase.getInstance(application).taskDao();
     }
-    public LiveData<List<Task>> getTasksThisWeek(long start, long end) {
-        return taskDao.getTasksThisWeek(start, end);
+
+    // ===== Truy vấn theo người dùng =====
+
+    public LiveData<List<Task>> getTasksByOwner(String owner) {
+        return taskDao.getTasksByOwner(owner);
     }
+
+    public LiveData<List<Task>> getTasksByCategory(String owner, String category) {
+        return taskDao.getTasksByCategory(owner, category);
+    }
+
+    public LiveData<List<Task>> getFavoriteTasks(String owner) {
+        return taskDao.getFavoriteTasks(owner);
+    }
+
+    public LiveData<List<Task>> getBirthdayTasks(String owner) {
+        return taskDao.getBirthdayTasks(owner);
+    }
+
+    public LiveData<List<Task>> getCompletedTasks(String owner) {
+        return taskDao.getCompletedTasks(owner);
+    }
+
+    public LiveData<List<Task>> getPendingTasks(String owner) {
+        return taskDao.getPendingTasks(owner);
+    }
+
+    public LiveData<List<Task>> getTasksThisWeek(String owner, long start, long end) {
+        return taskDao.getTasksThisWeek(owner, start, end);
+    }
+
+
+    // ===== Truy vấn tổng quát (tuỳ chọn) =====
+
     public LiveData<List<Task>> getAllTasks() {
         return taskDao.getAllTasks();
     }
 
-    public LiveData<List<Task>> getTasksByCategory(String category) {
-        return taskDao.getTasksByCategory(category);
-    }
+    // ===== Cập nhật / Xoá =====
 
     public void updateTask(Task task) {
         executor.execute(() -> taskDao.update(task));
