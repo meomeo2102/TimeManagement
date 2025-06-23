@@ -1,5 +1,7 @@
 package com.example.timemanagement;
 import androidx.appcompat.app.AlertDialog;
+
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,13 +10,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-
+import com.example.timemanagement.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -25,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     TaskDatabase db;
     private final Executor executor = Executors.newSingleThreadExecutor();
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,15 +76,35 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
+        NavigationView navView = findViewById(R.id.nav_view);
+        navView.setNavigationItemSelectedListener(item -> {
+                    int itemId = item.getItemId();
+
+                    if (itemId == R.id.nav_about) {
+                        Toast.makeText(this, "Giới thiệu app", Toast.LENGTH_SHORT).show();
+                    } else if (itemId == R.id.nav_share) {
+                        Toast.makeText(this, "Chia sẻ ứng dụng", Toast.LENGTH_SHORT).show();
+                    } else if (itemId == R.id.nav_theme_light) {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    } else if (itemId == R.id.nav_theme_dark) {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    } else if (itemId == R.id.nav_theme_system) {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                    }
+
+
+            DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+            drawerLayout.closeDrawers(); // đóng menu sau khi chọn
+
+            return true;
+        });
 
         BottomNavigationView bottomNavSecondary = findViewById(R.id.bottom_nav_secondary);
         bottomNavSecondary.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
             int itemId = item.getItemId();
 
-            if (itemId == R.id.nav_menu) {
-                selectedFragment = new MenuFragment();
-            } else if (itemId == R.id.nav_tasks) {
+            if (itemId == R.id.nav_tasks) {
                 selectedFragment = TaskFragment.newInstance("category", "Tất cả");
             } else if (itemId == R.id.nav_calendar) {
                 selectedFragment = new CalendarFragment();
@@ -105,50 +132,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showAddTaskDialog() {
-        AddTaskDialogFragment.newInstance().show(getSupportFragmentManager(), "AddTaskDialog");
+        AddTaskDialogFragment.newInstance(null).show(getSupportFragmentManager(), "AddTaskDialog");
     }
 
     public void editTask(Task task) {
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_task, null);
-        EditText edtTaskName = dialogView.findViewById(R.id.edtTaskName);
-        MaterialAutoCompleteTextView spinnerCategory = dialogView.findViewById(R.id.spinnerCategory);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1,
-                getResources().getStringArray(R.array.category_array));
-        spinnerCategory.setAdapter(adapter);
-
-        edtTaskName.setText(task.getName());
-        spinnerCategory.setText(task.getCategory(), false);
-
-        new MaterialAlertDialogBuilder(this)
-                .setTitle("Sửa công việc")
-                .setView(dialogView)
-                .setPositiveButton("Lưu", (d, which) -> {
-                    String taskName = edtTaskName.getText().toString().trim();
-                    String category = spinnerCategory.getText().toString().trim();
-                    if (!taskName.isEmpty() && !category.isEmpty()) {
-                        executor.execute(() -> {
-                            Task updatedTask = new Task(
-                                    taskName,
-                                    task.getCreatedAt(),
-                                    category,
-                                    task.getDeadlineTimestamp()
-                            );
-                            updatedTask.setId(task.getId());
-                            updatedTask.setCompleted(task.isCompleted());
-
-                            db.taskDao().update(updatedTask);
-                            runOnUiThread(this::reloadTasks);
-                        });
-                    } else {
-                        runOnUiThread(() -> Toast.makeText(this,
-                                "Vui lòng nhập tên công việc và danh mục!",
-                                Toast.LENGTH_SHORT).show());
-                    }
-                })
-                .setNegativeButton("Hủy", null)
-                .show();
+        AddTaskDialogFragment.newInstance(task)
+                .show(getSupportFragmentManager(), "EditTaskDialog");
     }
 
     public void reloadTasks() {

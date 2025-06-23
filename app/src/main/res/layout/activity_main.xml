@@ -18,7 +18,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             android:titleTextColor="@android:color/white"
-            app:title="To-Do List" />
+            app:title="Time Management" />
 
         <!-- Top Navigation Bar -->
         <com.google.android.material.card.MaterialCardView
@@ -88,7 +88,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:menu="@menu/nav_drawer_menu"
+        app:menu="@menu/fragment_menu"
         app:headerLayout="@layout/nav_header" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

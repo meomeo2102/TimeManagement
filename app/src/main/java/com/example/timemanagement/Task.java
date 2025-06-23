@@ -3,8 +3,10 @@ package com.example.timemanagement;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity
-public class Task {
+public class Task implements Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private int id;

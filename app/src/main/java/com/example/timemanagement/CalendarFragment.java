@@ -63,7 +63,7 @@ public class CalendarFragment extends Fragment {
             cal.set(year, month, dayOfMonth, 0, 0, 0);
             cal.set(Calendar.MILLISECOND, 0);
             long selectedDate = cal.getTimeInMillis();
-
+            calendarView.setDate(selectedDate, true, true);
             long[] range = getWeekRangeFrom(selectedDate);
             tvTitle.setText("Nhiệm vụ từ " + formatDate(range[0]) + " đến " + formatDate(range[1]));
             loadTasks(range[0], range[1]);

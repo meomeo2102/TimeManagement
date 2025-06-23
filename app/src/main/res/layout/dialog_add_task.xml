@@ -1,29 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingStart="32dp"
-    android:paddingEnd="32dp"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp"
     android:paddingTop="20dp"
-    android:paddingBottom="28dp"
-    android:fillViewport="true">
+    android:paddingBottom="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:clipToPadding="false">
+        android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tạo nhiệm vụ mới"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="12dp" />
-
-        <!-- Tên công việc -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,82 +24,97 @@
                 android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Danh mục -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp"
+            android:weightSum="2">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Ngày đến hạn">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtDeadlineDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:clickable="true" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Space
+                android:layout_width="12dp"
+                android:layout_height="wrap_content" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Giờ đến hạn">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtDeadlineTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:clickable="true" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Danh mục"
-            android:layout_marginTop="16dp"
-            app:endIconMode="dropdown_menu">
+            android:layout_marginTop="12dp">
 
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/spinnerCategory"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
+                android:dropDownHeight="200dp"
                 android:inputType="none" />
+
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Ngày tạo -->
         <TextView
             android:id="@+id/tvCreatedAt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ngày tạo: ..."
-            android:layout_marginTop="20dp"
-            android:textColor="@android:color/darker_gray" />
+            android:text="Ngày tạo: --:-- --/--/----"
+            android:textColor="#666"
+            android:textSize="13sp"
+            android:layout_marginTop="12dp" />
 
-        <!-- Ngày deadline -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
+        <CheckBox
+            android:id="@+id/checkboxCompleted"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Ngày đến hạn"
-            android:layout_marginTop="12dp">
+            android:text="Hoàn thành"
+            android:layout_marginTop="10dp" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtDeadlineDate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusable="false"
-                android:clickable="true"
-                android:inputType="none" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Giờ deadline -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Giờ đến hạn"
-            android:layout_marginTop="8dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtDeadlineTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusable="false"
-                android:clickable="true"
-                android:inputType="none" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Nút -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
             android:orientation="horizontal"
-            android:gravity="end">
+            android:gravity="end"
+            android:layout_marginTop="20dp">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:text="Hủy" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Lưu"
-                android:layout_marginStart="12dp" />
+                android:layout_marginStart="12dp"
+                android:text="Lưu" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

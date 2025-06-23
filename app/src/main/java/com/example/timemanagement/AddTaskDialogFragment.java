@@ -1,101 +1,115 @@
 package com.example.timemanagement;
 
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Toast;
-import android.widget.TextView;
-
+import android.view.*;
+import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.MaterialAutoCompleteTextView;
-
+import com.google.android.material.textfield.*;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.*;
+import java.util.concurrent.*;
 
 public class AddTaskDialogFragment extends DialogFragment {
 
+    private static final String ARG_TASK = "task_to_edit";
+
     private TextInputEditText edtTaskName, edtDeadlineDate, edtDeadlineTime;
     private MaterialAutoCompleteTextView spinnerCategory;
+    private CheckBox checkboxCompleted;
     private TextView tvCreatedAt;
-    private Calendar deadlineCalendar = Calendar.getInstance();
 
+    private Calendar deadlineCalendar = Calendar.getInstance();
     private Executor executor;
     private TaskDatabase db;
+    private Task taskToEdit;
 
-    public static AddTaskDialogFragment newInstance() {
-        return new AddTaskDialogFragment();
+    public static AddTaskDialogFragment newInstance(@Nullable Task task) {
+        AddTaskDialogFragment fragment = new AddTaskDialogFragment();
+        if (task != null) {
+            Bundle args = new Bundle();
+            args.putSerializable(ARG_TASK, task);
+            fragment.setArguments(args);
+        }
+        return fragment;
     }
 
-    @NonNull
+    @Nullable
     @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        View dialogView = LayoutInflater.from(requireContext())
-                .inflate(R.layout.dialog_add_task, null);
-
-        Dialog dialog = new Dialog(requireContext());
-        dialog.setContentView(dialogView);
-        dialog.setCancelable(false);
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setLayout(
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.dialog_add_task, container, false);
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (getDialog() != null && getDialog().getWindow() != null) {
+            getDialog().getWindow().setLayout(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
             );
         }
+    }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
+        edtTaskName = view.findViewById(R.id.edtTaskName);
+        edtDeadlineDate = view.findViewById(R.id.edtDeadlineDate);
+        edtDeadlineTime = view.findViewById(R.id.edtDeadlineTime);
+        spinnerCategory = view.findViewById(R.id.spinnerCategory);
+        checkboxCompleted = view.findViewById(R.id.checkboxCompleted);
+        tvCreatedAt = view.findViewById(R.id.tvCreatedAt);
 
-        // Ánh xạ view
-        edtTaskName = dialogView.findViewById(R.id.edtTaskName);
-        edtDeadlineDate = dialogView.findViewById(R.id.edtDeadlineDate);
-        edtDeadlineTime = dialogView.findViewById(R.id.edtDeadlineTime);
-        spinnerCategory = dialogView.findViewById(R.id.spinnerCategory);
-        tvCreatedAt = dialogView.findViewById(R.id.tvCreatedAt);
+        MaterialButton btnCancel = view.findViewById(R.id.btnCancel);
+        MaterialButton btnSave = view.findViewById(R.id.btnSave);
 
         executor = Executors.newSingleThreadExecutor();
         db = TaskDatabase.getInstance(requireContext());
 
-        // Danh mục
-        String[] categories = {
-                "Công việc", "Cá nhân", "Danh sách yêu thích", "Ngày sinh nhật", "Không phân loại"
-        };
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
-                android.R.layout.simple_list_item_1, categories);
+        if (getArguments() != null) {
+            taskToEdit = (Task) getArguments().getSerializable(ARG_TASK);
+        }
+
+        String[] categories = {"Công việc", "Cá nhân", "Danh sách yêu thích", "Ngày sinh nhật", "Không phân loại"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, categories);
         spinnerCategory.setAdapter(adapter);
         spinnerCategory.setOnClickListener(v -> spinnerCategory.showDropDown());
 
-        // Gán ngày tạo
-        long createdAt = System.currentTimeMillis();
+        long createdAt;
+
+        if (taskToEdit != null) {
+            edtTaskName.setText(taskToEdit.getName());
+            spinnerCategory.setText(taskToEdit.getCategory(), false);
+            checkboxCompleted.setChecked(taskToEdit.isCompleted());
+
+            deadlineCalendar.setTimeInMillis(taskToEdit.getDeadlineTimestamp());
+            edtDeadlineDate.setText(new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(deadlineCalendar.getTime()));
+            edtDeadlineTime.setText(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(deadlineCalendar.getTime()));
+
+            createdAt = taskToEdit.getCreatedAt();
+        } else {
+            createdAt = System.currentTimeMillis();
+        }
+
         tvCreatedAt.setText("Ngày tạo: " + formatDateTime(createdAt));
 
-        // Chọn ngày deadline
         edtDeadlineDate.setOnClickListener(v -> {
             Calendar now = Calendar.getInstance();
-            new DatePickerDialog(requireContext(), (view, y, m, d) -> {
+            new DatePickerDialog(requireContext(), (view1, y, m, d) -> {
                 deadlineCalendar.set(Calendar.YEAR, y);
                 deadlineCalendar.set(Calendar.MONTH, m);
                 deadlineCalendar.set(Calendar.DAY_OF_MONTH, d);
-
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                edtDeadlineDate.setText(sdf.format(deadlineCalendar.getTime()));
+                edtDeadlineDate.setText(new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(deadlineCalendar.getTime()));
             }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)).show();
         });
 
-        // Chọn giờ deadline
         edtDeadlineTime.setOnClickListener(v -> {
-            new TimePickerDialog(requireContext(), (view, h, min) -> {
+            new TimePickerDialog(requireContext(), (view12, h, min) -> {
                 deadlineCalendar.set(Calendar.HOUR_OF_DAY, h);
                 deadlineCalendar.set(Calendar.MINUTE, min);
                 deadlineCalendar.set(Calendar.SECOND, 0);
@@ -104,11 +118,7 @@ public class AddTaskDialogFragment extends DialogFragment {
             }, 14, 0, true).show();
         });
 
-        // Nút
-        MaterialButton btnCancel = dialogView.findViewById(R.id.btnCancel);
-        MaterialButton btnSave = dialogView.findViewById(R.id.btnSave);
-
-        btnCancel.setOnClickListener(v -> dialog.dismiss());
+        btnCancel.setOnClickListener(v -> dismiss());
 
         btnSave.setOnClickListener(v -> {
             String taskName = edtTaskName.getText().toString().trim();
@@ -140,24 +150,40 @@ public class AddTaskDialogFragment extends DialogFragment {
                 return;
             }
 
-            Task task = new Task(taskName, createdAt, category, deadlineMillis);
+            boolean isCompleted = checkboxCompleted.isChecked();
 
-            executor.execute(() -> {
-                db.taskDao().insert(task);
-                requireActivity().runOnUiThread(() -> {
-                    if (requireActivity() instanceof MainActivity) {
-                        ((MainActivity) requireActivity()).reloadTasks();
-                    }
-                    dialog.dismiss();
+            if (taskToEdit != null) {
+                Task updatedTask = new Task(taskName, createdAt, category, deadlineMillis);
+                updatedTask.setId(taskToEdit.getId());
+                updatedTask.setCompleted(isCompleted);
+
+                executor.execute(() -> {
+                    db.taskDao().update(updatedTask);
+                    requireActivity().runOnUiThread(() -> {
+                        if (requireActivity() instanceof MainActivity) {
+                            ((MainActivity) requireActivity()).reloadTasks();
+                        }
+                        dismiss();
+                    });
                 });
-            });
-        });
+            } else {
+                Task task = new Task(taskName, createdAt, category, deadlineMillis);
+                task.setCompleted(isCompleted);
 
-        return dialog;
+                executor.execute(() -> {
+                    db.taskDao().insert(task);
+                    requireActivity().runOnUiThread(() -> {
+                        if (requireActivity() instanceof MainActivity) {
+                            ((MainActivity) requireActivity()).reloadTasks();
+                        }
+                        dismiss();
+                    });
+                });
+            }
+        });
     }
 
     private String formatDateTime(long millis) {
-        return new SimpleDateFormat("HH:mm dd/MM/yyyy", Locale.getDefault())
-                .format(new Date(millis));
+        return new SimpleDateFormat("HH:mm dd/MM/yyyy", Locale.getDefault()).format(new Date(millis));
     }
 }

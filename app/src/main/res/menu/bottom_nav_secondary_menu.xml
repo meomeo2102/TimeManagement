@@ -2,10 +2,6 @@
 <!-- bottom_nav_secondary_menu.xml -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/nav_menu"
-        android:title="Menu"
-        android:icon="@drawable/ic_menu" />
-    <item
         android:id="@+id/nav_tasks"
         android:title="Nhiệm vụ"
         android:icon="@drawable/ic_tasks" />
