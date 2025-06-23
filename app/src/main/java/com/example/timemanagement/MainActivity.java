@@ -2,6 +2,7 @@ package com.example.timemanagement;
 import androidx.appcompat.app.AlertDialog;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +11,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-
+import android.content.pm.PackageManager;
+import android.os.Build;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -36,7 +38,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        NotificationUtil.createChannel(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1001);
+            }
+        }
         db = TaskDatabase.getInstance(this);
 
         // Hiển thị TaskFragment mặc định
@@ -78,24 +85,34 @@ public class MainActivity extends AppCompatActivity {
         });
         NavigationView navView = findViewById(R.id.nav_view);
         navView.setNavigationItemSelectedListener(item -> {
-                    int itemId = item.getItemId();
+            int itemId = item.getItemId();
 
-                    if (itemId == R.id.nav_about) {
-                        Toast.makeText(this, "Giới thiệu app", Toast.LENGTH_SHORT).show();
-                    } else if (itemId == R.id.nav_share) {
-                        Toast.makeText(this, "Chia sẻ ứng dụng", Toast.LENGTH_SHORT).show();
-                    } else if (itemId == R.id.nav_theme_light) {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                    } else if (itemId == R.id.nav_theme_dark) {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                    } else if (itemId == R.id.nav_theme_system) {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-                    }
+            if (itemId == R.id.nav_about) {
+                new AlertDialog.Builder(this)
+                        .setTitle("Giới thiệu ứng dụng")
+                        .setMessage("Time Management là ứng dụng giúp bạn tạo, theo dõi và hoàn thành công việc hiệu quả mỗi ngày.\n\nChủ sở hữu: Huỳnh Giao\nPhiên bản: 1.0.0")
+                        .setPositiveButton("Đóng", null)
+                        .show();
 
+            } else if (itemId == R.id.nav_share) {
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_SUBJECT, "Time Management App");
+                intent.putExtra(Intent.EXTRA_TEXT, "Tải ứng dụng quản lý công việc cực xịn nè: https://drive.google.com/drive/folders/122lZKmY1pC_nJH_M20JA7D_xUzUnVif_");
+                startActivity(Intent.createChooser(intent, "Chia sẻ qua..."));
+
+            } else if (itemId == R.id.nav_theme_light) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
+            } else if (itemId == R.id.nav_theme_dark) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+
+            } else if (itemId == R.id.nav_theme_system) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+            }
 
             DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
-            drawerLayout.closeDrawers(); // đóng menu sau khi chọn
-
+            drawerLayout.closeDrawers(); // Đóng menu sau khi chọn
             return true;
         });
 
@@ -153,5 +170,16 @@ public class MainActivity extends AppCompatActivity {
 
     public TaskViewModel getTaskViewModel() {
         return new ViewModelProvider(this).get(TaskViewModel.class);
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1001) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Đã cấp quyền thông báo", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Không có quyền gửi thông báo. Bạn có thể không nhận được nhắc nhở!", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }

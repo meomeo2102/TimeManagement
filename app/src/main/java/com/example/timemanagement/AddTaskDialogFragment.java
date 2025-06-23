@@ -160,6 +160,8 @@ public class AddTaskDialogFragment extends DialogFragment {
                 executor.execute(() -> {
                     db.taskDao().update(updatedTask);
                     requireActivity().runOnUiThread(() -> {
+                        NotificationUtil.showTaskReminder(requireContext(), taskName);
+
                         if (requireActivity() instanceof MainActivity) {
                             ((MainActivity) requireActivity()).reloadTasks();
                         }
@@ -173,6 +175,8 @@ public class AddTaskDialogFragment extends DialogFragment {
                 executor.execute(() -> {
                     db.taskDao().insert(task);
                     requireActivity().runOnUiThread(() -> {
+                        NotificationUtil.showTaskReminder(requireContext(), taskName);
+
                         if (requireActivity() instanceof MainActivity) {
                             ((MainActivity) requireActivity()).reloadTasks();
                         }

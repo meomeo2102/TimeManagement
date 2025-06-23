@@ -14,17 +14,17 @@
 
         <item
             android:id="@+id/nav_theme_light"
-            android:title="🌞 Giao diện sáng"
+            android:title="Giao diện sáng"
             android:icon="@drawable/ic_light_mode" />
 
         <item
             android:id="@+id/nav_theme_dark"
-            android:title="🌙 Giao diện tối"
+            android:title="Giao diện tối"
             android:icon="@drawable/ic_dark_mode" />
 
         <item
             android:id="@+id/nav_theme_system"
-            android:title="🌓 Theo hệ thống"
+            android:title="Theo hệ thống"
             android:icon="@drawable/ic_auto_mode" />
     </group>
 
