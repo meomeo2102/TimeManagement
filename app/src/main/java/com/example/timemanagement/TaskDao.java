@@ -65,4 +65,5 @@ public interface TaskDao {
 
     @Query("SELECT * FROM Task ORDER BY createdAt DESC")
     LiveData<List<Task>> getAllTasks();
+
 }

@@ -13,7 +13,7 @@
     <!-- Văn bản -->
     <color name="textPrimary">#1D3557</color>
     <color name="textSecondary">#6C757D</color>
-
+    <color name="white">#FFFFFF</color>
     <!-- Nền thẻ -->
     <color name="taskCard">#F1FAEE</color>
     <color name="mint_done">#C8E6C9</color>
