@@ -46,6 +46,8 @@ public interface TaskDao {
 
     @Query("SELECT * FROM Task WHERE completed = 1 ORDER BY createdAt DESC")
     LiveData<List<Task>> getCompletedTasks();
+    @Query("SELECT COUNT(*) FROM Task WHERE completed = :status")
+    int countCompleted(boolean status);
 
     @Query("SELECT * FROM Task WHERE completed = 0 ORDER BY createdAt DESC")
     LiveData<List<Task>> getPendingTasks();

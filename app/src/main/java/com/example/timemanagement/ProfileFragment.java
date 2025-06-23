@@ -24,8 +24,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
-public class ProfileFragment extends Fragment {
+import java.util.concurrent.Executors;
 
+public class ProfileFragment extends Fragment {
+    private TextView tvCompleted, tvUncompleted;
     private TextView userInfo;
     private ImageView userAvatar;
     private Button btnGoogleLogin, btnLogout;
@@ -35,7 +37,8 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
-
+        tvCompleted = view.findViewById(R.id.tv_completed);
+        tvUncompleted = view.findViewById(R.id.tv_uncompleted);
         userInfo = view.findViewById(R.id.user_info);
         userAvatar = view.findViewById(R.id.user_avatar);
         btnGoogleLogin = view.findViewById(R.id.btn_google_login);
@@ -83,7 +86,19 @@ public class ProfileFragment extends Fragment {
 
         return view;
     }
+    private void fetchTaskStats() {
+        TaskDatabase db = TaskDatabase.getInstance(requireContext());
 
+        Executors.newSingleThreadExecutor().execute(() -> {
+            int completedCount = db.taskDao().countCompleted(true);
+            int uncompletedCount = db.taskDao().countCompleted(false);
+
+            requireActivity().runOnUiThread(() -> {
+                tvCompleted.setText(String.valueOf(completedCount));
+                tvUncompleted.setText(String.valueOf(uncompletedCount));
+            });
+        });
+    }
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
@@ -105,11 +120,18 @@ public class ProfileFragment extends Fragment {
 
             btnGoogleLogin.setVisibility(View.GONE);
             btnLogout.setVisibility(View.VISIBLE);
+
+            fetchTaskStats();
         } else {
             userInfo.setText("Bạn chưa đăng nhập");
             userAvatar.setImageResource(R.drawable.ic_launcher_foreground);
             btnGoogleLogin.setVisibility(View.VISIBLE);
             btnLogout.setVisibility(View.GONE);
+
+            // Xoá thống kê nếu đăng xuất
+            tvCompleted.setText("");
+            tvUncompleted.setText("");
         }
     }
+
 }
